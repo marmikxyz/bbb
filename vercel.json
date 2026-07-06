@@ -1,5 +1,11 @@
 {
   "version": 2,
-  "builds": [{ "src": "index.html", "use": "@vercel/static" }],
-  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "quizzes.json", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/quizzes.json", "dest": "/quizzes.json" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
