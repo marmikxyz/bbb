@@ -1,0 +1,31 @@
+{
+  "site": {
+    "name": "Marmik Archive",
+    "tagline": "Practice tests. Real exam feel. Built for serious prep."
+  },
+  "quizzes": [
+    {
+      "id": "sample-gk-quiz",
+      "title": "Sample GK Quiz",
+      "category": "General Knowledge",
+      "difficulty": "Easy",
+      "duration_minutes": 2,
+      "marks_correct": 1,
+      "marks_negative": 0.25,
+      "questions": [
+        {
+          "text": "What is the capital of India?",
+          "options": ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
+          "correct": 1,
+          "explanation": "New Delhi is the capital of India."
+        },
+        {
+          "text": "Which planet is known as the Red Planet?",
+          "options": ["Venus", "Jupiter", "Mars", "Saturn"],
+          "correct": 2,
+          "explanation": "Mars appears red due to iron oxide on its surface."
+        }
+      ]
+    }
+  ]
+}
