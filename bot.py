@@ -11,7 +11,7 @@ from telegram.ext import (
     filters,
 )
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "PUT_YOUR_BOT_TOKEN_HERE")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8756162788:AAEZV09m8X1napx-JKiK6FPa2fTrZjo0qWY")
 
 # In-memory draft store: { user_id: {title, category, duration, questions: [...]} }
 DRAFTS = {}
