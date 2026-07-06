@@ -1,0 +1,19 @@
+{
+  "id": "ssc-gk-mock-1-1783332446",
+  "title": "SSC GK Mock 1",
+  "category": "General Knowledge",
+  "duration_minutes": 15,
+  "questions": [
+    {
+      "text": "Capital of France kya hai?",
+      "options": [
+        "Paris",
+        "London",
+        "Berlin",
+        "Madrid"
+      ],
+      "correct": 0,
+      "explanation": "Paris France ki capital hai."
+    }
+  ]
+}
