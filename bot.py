@@ -4,7 +4,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-BOT_TOKEN = "8783176299:AAHgfs_Kk2vpBRdLHQ4XLPcjGIvJmcjQQYw"
+BOT_TOKEN = "8756162788:AAEZV09m8X1napx-JKiK6FPa2fTrZjo0qWY"
 OWNER_ID = None  # Will be set on first /start
 
 # ─────────────────────────────────────────────
