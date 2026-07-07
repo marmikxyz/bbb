@@ -1,1393 +1,795 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="hi">
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Ranaji Quiz</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Poppins,sans-serif;
+:root {
+  --bg: #080810;
+  --surface: #10101a;
+  --card: #14141e;
+  --border: #1f1f30;
+  --accent: #e63946;
+  --blue: #229ED9;
+  --gold: #f4a261;
+  --text: #f0edf6;
+  --muted: #666680;
+  --green: #2ec27e;
 }
-
-body{
-
-background:#0d1117;
-
-color:white;
-
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
 }
-
-header{
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-padding:18px 30px;
-
-background:#161b22;
-
-border-bottom:1px solid #30363d;
-
-position:sticky;
-
-top:0;
-
-z-index:100;
-
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 70% 40% at 15% 5%, rgba(230,57,70,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 95%, rgba(34,158,217,.05) 0%, transparent 60%);
+  pointer-events:none; z-index:0;
 }
-
-.logo{
-
-font-size:28px;
-
-font-weight:bold;
-
-color:#58a6ff;
-
+/* ══ HEADER ══ */
+header {
+  position:relative; z-index:10;
+  background: rgba(8,8,16,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display:flex; align-items:center; gap:1rem;
 }
-
-.search{
-
-display:flex;
-
-gap:10px;
-
+.logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem; letter-spacing:3px;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-
-.search input{
-
-width:350px;
-
-padding:12px;
-
-border:none;
-
-outline:none;
-
-border-radius:8px;
-
-background:#21262d;
-
-color:white;
-
+.header-right { margin-left:auto; display:flex; gap:.75rem; align-items:center; }
+.btn-small {
+  padding:.45rem 1rem; border-radius:7px; font-size:.8rem; font-weight:500;
+  cursor:pointer; border:none; font-family:'DM Sans',sans-serif; transition:.2s;
 }
-
-.adminBtn{
-
-background:#238636;
-
-color:white;
-
-border:none;
-
-padding:10px 18px;
-
-border-radius:8px;
-
-cursor:pointer;
-
+.btn-admin { background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+.btn-admin:hover { color:var(--text); border-color:var(--muted); }
+.count-badge {
+  background:var(--accent); color:#fff; font-size:.72rem;
+  padding:2px 8px; border-radius:20px; font-weight:600;
 }
-
-.hero{
-
-padding:60px;
-
-text-align:center;
-
+/* ══ PAGES ══ */
+.page { display:none; position:relative; z-index:1; }
+.page.active { display:block; }
+/* ══ HOME ══ */
+#home { padding: 2.5rem 2rem; max-width:1200px; margin:0 auto; }
+.hero { text-align:center; padding:3rem 1rem 2.5rem; }
+.hero h1 { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:4px; margin-bottom:.5rem; }
+.hero p { color:var(--muted); font-size:1rem; }
+.empty-state {
+  text-align:center; padding:5rem 2rem;
+  border: 1px dashed var(--border); border-radius:16px;
+  margin-top:1rem;
 }
-
-.hero h1{
-
-font-size:50px;
-
-margin-bottom:10px;
-
+.empty-state .icon { font-size:3.5rem; margin-bottom:1rem; opacity:.5; }
+.empty-state h3 { font-size:1.2rem; margin-bottom:.5rem; color:var(--muted); }
+.empty-state p { color:var(--muted); font-size:.85rem; line-height:1.7; }
+/* Grid */
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+  gap:1.25rem;
+  margin-top:2rem;
 }
-
-.hero p{
-
-opacity:.8;
-
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
 }
-
-.filters{
-
-display:flex;
-
-gap:10px;
-
-justify-content:center;
-
-margin-bottom:40px;
-
-flex-wrap:wrap;
-
+.card:hover { transform:translateY(-3px); border-color:#2a2a40; box-shadow:0 12px 40px rgba(0,0,0,.5); }
+.card-thumb {
+  width:100%; aspect-ratio:16/9;
+  background:var(--surface);
+  position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
 }
-
-.filter{
-
-padding:10px 20px;
-
-background:#21262d;
-
-border-radius:25px;
-
-cursor:pointer;
-
+.card-thumb .type-icon { font-size:2.5rem; opacity:.4; }
+.card-thumb .play-btn {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.4);
+  font-size:1.1rem; font-weight:600; letter-spacing:1px;
+  opacity:0; transition:.2s;
 }
-
-.filter:hover{
-
-background:#30363d;
-
+.card:hover .play-btn { opacity:1; }
+.card-type-badge {
+  position:absolute; top:.5rem; left:.5rem;
+  font-size:.65rem; font-weight:700; letter-spacing:1px;
+  padding:3px 8px; border-radius:5px;
+  text-transform:uppercase;
 }
-
-.grid{
-
-display:grid;
-
-grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-
-gap:25px;
-
-padding:25px;
-
+.badge-easy { background:var(--green); color:#062; }
+.badge-medium { background:var(--gold); color:#3a2200; }
+.badge-hard { background:var(--accent); color:#fff; }
+.badge-score {
+  position:absolute; top:.5rem; right:.5rem;
+  font-size:.65rem; font-weight:700;
+  padding:3px 8px; border-radius:5px;
+  background:rgba(0,0,0,.55); color:var(--gold);
 }
-
-.card{
-
-background:#161b22;
-
-border-radius:15px;
-
-overflow:hidden;
-
-cursor:pointer;
-
-transition:.3s;
-
-border:1px solid #30363d;
-
+.card-body { padding:1rem; }
+.card-title {
+  font-size:.9rem; font-weight:500; line-height:1.4;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden; margin-bottom:.5rem;
 }
-
-.card:hover{
-
-transform:translateY(-6px);
-
+.card-meta { font-size:.75rem; color:var(--muted); display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
+/* ══ MODAL ══ */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,.85); backdrop-filter:blur(8px);
+  align-items:center; justify-content:center; padding:1rem;
 }
-
-.thumb{
-
-height:180px;
-
-background:linear-gradient(135deg,#238636,#58a6ff);
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-font-size:70px;
-
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  width:100%; max-width:900px;
+  max-height:92vh; overflow-y:auto;
+  animation:modalIn .25s ease;
 }
-
-.content{
-
-padding:20px;
-
+@keyframes modalIn { from { opacity:0; transform:scale(.96) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.modal-header {
+  padding:1.2rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; gap:1rem;
+  position:sticky; top:0; background:var(--surface); z-index:2;
 }
-
-.title{
-
-font-size:22px;
-
-font-weight:600;
-
-margin-bottom:10px;
-
+.modal-title { font-size:1rem; font-weight:500; line-height:1.5; flex:1; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; padding:.2rem .5rem; transition:.2s; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-body { padding:1.5rem; }
+.media-error {
+  background:rgba(230,57,70,.1); border:1px solid rgba(230,57,70,.2);
+  border-radius:10px; padding:2rem; text-align:center;
 }
-
-.meta{
-
-display:flex;
-
-justify-content:space-between;
-
-font-size:14px;
-
-opacity:.7;
-
-margin-top:10px;
-
+.media-error p { color:var(--muted); font-size:.9rem; line-height:1.7; }
+.modal-meta {
+  margin-top:1rem;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:10px; padding:1rem 1.2rem;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:.75rem;
 }
-
-.start{
-
-margin-top:20px;
-
-width:100%;
-
-padding:12px;
-
-background:#238636;
-
-color:white;
-
-border:none;
-
-border-radius:8px;
-
-cursor:pointer;
-
+.modal-meta-info { font-size:.82rem; color:var(--muted); line-height:1.6; }
+.modal-meta-info strong { color:var(--text); }
+.btn-tg {
+  display:inline-flex; align-items:center; gap:.4rem;
+  background:var(--blue); color:#fff;
+  padding:.5rem 1.1rem; border-radius:7px;
+  font-size:.82rem; font-weight:500; text-decoration:none;
+  border:none; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:.2s;
 }
-
-.start:hover{
-
-background:#2ea043;
-
+.btn-tg:hover { opacity:.85; }
+.btn-tg:disabled { opacity:.4; cursor:not-allowed; }
+/* ══ TEST TAKING ══ */
+.test-topbar { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.2rem; flex-wrap:wrap; }
+.timer {
+  font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:1.3rem;
+  background:var(--card); border:1px solid var(--border); padding:.4rem 1rem; border-radius:8px;
 }
-
-/* Quiz */
-
-.overlay{
-
-position:fixed;
-
-left:0;
-
-top:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,.8);
-
-display:none;
-
-justify-content:center;
-
-align-items:center;
-
-z-index:999;
-
+.timer.low { color:var(--accent); border-color:var(--accent); }
+.q-nav { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.2rem; }
+.q-dot {
+  width:32px; height:32px; border-radius:7px; border:1px solid var(--border);
+  background:var(--card); color:var(--muted); font-size:.78rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:.15s;
 }
-
-.modal{
-
-width:900px;
-
-max-width:95%;
-
-background:#161b22;
-
-border-radius:12px;
-
-padding:25px;
-
+.q-dot.answered { background:rgba(46,194,126,.18); border-color:var(--green); color:var(--green); }
+.q-dot.current { border-color:var(--gold); color:var(--gold); box-shadow:0 0 0 2px rgba(244,162,97,.25); }
+.q-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; }
+.q-progress { font-size:.75rem; color:var(--muted); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:1px; }
+.q-text { font-size:1.05rem; font-weight:500; line-height:1.6; margin-bottom:1.2rem; }
+.option {
+  display:flex; align-items:center; gap:.75rem;
+  border:1px solid var(--border); border-radius:9px; padding:.8rem 1rem;
+  margin-bottom:.6rem; cursor:pointer; transition:.15s;
 }
-
-.questionNo{
-
-font-size:18px;
-
-margin-bottom:20px;
-
+.option:hover { border-color:var(--muted); }
+.option.selected { border-color:var(--blue); background:rgba(34,158,217,.1); }
+.option .opt-letter {
+  width:26px; height:26px; border-radius:50%; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:.75rem; flex-shrink:0;
 }
-
-.timer{
-
-float:right;
-
-color:#58a6ff;
-
+.option.selected .opt-letter { background:var(--blue); border-color:var(--blue); color:#fff; }
+.q-actions { display:flex; justify-content:space-between; gap:.75rem; margin-top:1.4rem; flex-wrap:wrap; }
+.btn-nav {
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  padding:.55rem 1.2rem; border-radius:8px; cursor:pointer; font-family:'DM Sans',sans-serif;
+  font-size:.85rem; transition:.2s;
 }
-
-.question{
-
-font-size:24px;
-
-margin-bottom:25px;
-
+.btn-nav:hover { border-color:var(--muted); }
+.btn-nav:disabled { opacity:.35; cursor:not-allowed; }
+.btn-submit-test {
+  background:var(--accent); color:#fff; border:none;
+  padding:.55rem 1.3rem; border-radius:8px; cursor:pointer; font-weight:600;
+  font-family:'DM Sans',sans-serif; font-size:.85rem;
 }
-
-.option{
-
-padding:15px;
-
-background:#21262d;
-
-margin-bottom:12px;
-
-border-radius:8px;
-
-cursor:pointer;
-
-}
-
-.option:hover{
-
-background:#30363d;
-
-}
-
-.nav{
-
-display:flex;
-
-justify-content:space-between;
-
-margin-top:30px;
-
-}
-
-.nav button{
-
-padding:12px 20px;
-
-border:none;
-
-border-radius:8px;
-
-cursor:pointer;
-
-}
-
-.prev{
-
-background:#30363d;
-
-color:white;
-
-}
-
-.next{
-
-background:#238636;
-
-color:white;
-
-}
-
-.submit{
-
-background:#d29922;
-
-color:white;
-
-}
-
 /* Result */
-
-.result{
-
-display:none;
-
-text-align:center;
-
+.result-hero { text-align:center; padding:1.5rem 0 1rem; }
+.result-score { font-family:'Bebas Neue',sans-serif; font-size:3.2rem; letter-spacing:2px; }
+.result-score span { font-size:1.6rem; color:var(--muted); }
+.result-stats { display:flex; justify-content:center; gap:1.5rem; margin-top:1rem; flex-wrap:wrap; }
+.rstat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:.8rem 1.2rem; text-align:center; min-width:90px; }
+.rstat b { display:block; font-size:1.3rem; }
+.rstat.correct b { color:var(--green); }
+.rstat.wrong b { color:var(--accent); }
+.rstat.skip b { color:var(--muted); }
+.review-item { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; margin-bottom:.7rem; }
+.review-item .q-text { font-size:.9rem; margin-bottom:.6rem; }
+.review-opt { padding:.4rem .7rem; border-radius:7px; font-size:.82rem; margin-bottom:.35rem; border:1px solid var(--border); }
+.review-opt.correct { border-color:var(--green); background:rgba(46,194,126,.1); color:var(--green); }
+.review-opt.wrong { border-color:var(--accent); background:rgba(230,57,70,.1); color:var(--accent); }
+/* ══ ADMIN PANEL ══ */
+#admin { padding:2rem; max-width:800px; margin:0 auto; }
+.admin-header { display:flex; align-items:center; gap:1rem; margin-bottom:2rem; }
+.admin-header h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; }
+.back-btn {
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--muted); padding:.4rem .9rem; border-radius:7px;
+  cursor:pointer; font-size:.82rem; font-family:'DM Sans',sans-serif;
+  transition:.2s;
 }
-
-.result h2{
-
-font-size:35px;
-
-margin-bottom:20px;
-
+.back-btn:hover { color:var(--text); }
+.upload-zone {
+  border:2px dashed var(--border); border-radius:14px; padding:3rem 2rem;
+  text-align:center; cursor:pointer; transition:.25s; position:relative;
 }
-
-.score{
-
-font-size:60px;
-
-color:#58a6ff;
-
-margin:20px;
-
+.upload-zone:hover, .upload-zone.dragover { border-color:var(--accent); background:rgba(230,57,70,.05); }
+.upload-zone .uz-icon { font-size:3rem; margin-bottom:1rem; }
+.upload-zone h3 { margin-bottom:.5rem; }
+.upload-zone p { color:var(--muted); font-size:.85rem; }
+.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.uploaded-list { margin-top:2rem; }
+.uploaded-list h3 { font-size:.78rem; font-weight:600; margin-bottom:1rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.json-item {
+  background:var(--card); border:1px solid var(--border); border-radius:10px; padding:.9rem 1.2rem;
+  margin-bottom:.6rem; display:flex; align-items:center; gap:.75rem; animation:fadeIn .3s ease;
 }
-
-.close{
-
-background:#238636;
-
-color:white;
-
-padding:12px 25px;
-
-border:none;
-
-border-radius:8px;
-
-cursor:pointer;
-
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.json-item .ji-icon {
+  width:36px; height:36px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; flex-shrink:0;
 }
-
+.ji-easy { background:rgba(46,194,126,.2); }
+.ji-medium { background:rgba(244,162,97,.2); }
+.ji-hard { background:rgba(230,57,70,.2); }
+.ji-info { flex:1; min-width:0; }
+.ji-title { font-size:.88rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ji-sub { font-size:.75rem; color:var(--muted); margin-top:2px; }
+.ji-actions { display:flex; gap:.5rem; flex-shrink:0; }
+.ji-del {
+  background:rgba(230,57,70,.1); border:1px solid rgba(230,57,70,.2);
+  color:var(--accent); padding:.3rem .7rem; border-radius:6px;
+  font-size:.75rem; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:.2s;
+}
+.ji-del:hover { background:rgba(230,57,70,.2); }
+.save-bar { position:fixed; bottom:1.5rem; right:1.5rem; display:flex; gap:.75rem; z-index:100; }
+.btn-save {
+  background:var(--accent); color:#fff; border:none; padding:.65rem 1.5rem; border-radius:9px;
+  font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
+  cursor:pointer; box-shadow:0 4px 20px rgba(230,57,70,.35); transition:.2s;
+}
+.btn-save:hover { transform:translateY(-1px); }
+.btn-export {
+  background:var(--surface); color:var(--text); border:1px solid var(--border);
+  padding:.65rem 1.2rem; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:.9rem;
+  cursor:pointer; transition:.2s;
+}
+.btn-export:hover { border-color:var(--muted); }
+.toast {
+  position:fixed; bottom:5rem; left:50%; transform:translateX(-50%);
+  background:var(--green); color:#fff; padding:.6rem 1.4rem; border-radius:8px;
+  font-size:.85rem; font-weight:500; z-index:200; pointer-events:none;
+  animation:toastAnim .3s ease; display:none;
+}
+@keyframes toastAnim { from { opacity:0; transform:translate(-50%,10px); } to { opacity:1; transform:translate(-50%,0); } }
+footer { position:relative; z-index:1; text-align:center; padding:2rem; color:var(--muted); font-size:.78rem; border-top:1px solid var(--border); margin-top:3rem; }
+@media(max-width:600px) {
+  header { padding:.8rem 1rem; }
+  .hero h1 { font-size:2.2rem; }
+  #home { padding:1.5rem 1rem; }
+  .grid { grid-template-columns:1fr 1fr; gap:.75rem; }
+  .modal { max-width:100%; max-height:100vh; border-radius:0; }
+  .result-stats { gap:.7rem; }
+}
 </style>
-
 </head>
-
 <body>
 
 <header>
-
-<div class="logo">
-
-Ranaji Quiz
-
-</div>
-
-<div class="search">
-
-<input
-id="search"
-placeholder="Search quiz...">
-
-<button
-class="adminBtn">
-
-⚙ Admin
-
-</button>
-
-</div>
-
+  <div class="logo">Ranaji Quiz</div>
+  <div class="header-right">
+    <span class="count-badge" id="count-badge">0 tests</span>
+    <button class="btn-small btn-admin" onclick="goAdmin()">⚙️ Admin</button>
+  </div>
 </header>
 
-<section class="hero">
-
-<h1>
-
-SSC Mock Tests
-
-</h1>
-
-<p>
-
-Practice Unlimited Questions
-
-</p>
-
-</section>
-
-<div class="filters">
-
-<div class="filter">All</div>
-
-<div class="filter">Reasoning</div>
-
-<div class="filter">English</div>
-
-<div class="filter">Math</div>
-
-<div class="filter">GK</div>
-
-<div class="filter">Current Affairs</div>
-
+<!-- ══ HOME PAGE ══ -->
+<div id="page-home" class="page active">
+  <div id="home">
+    <div class="hero">
+      <h1>📝 Ranaji Quiz</h1>
+      <p>Mock tests • Practice papers • Instant results</p>
+    </div>
+    <div id="grid-container"></div>
+  </div>
+  <footer>Ranaji Quiz • Practice Karo, Pass Karo • @ranajoji</footer>
 </div>
 
-<div
-id="quizGrid"
-class="grid">
+<!-- ══ ADMIN PAGE ══ -->
+<div id="page-admin" class="page">
+  <div id="admin">
+    <div class="admin-header">
+      <button class="back-btn" onclick="goHome()">← Back</button>
+      <h2>⚙️ Admin Panel</h2>
+    </div>
 
+    <div class="upload-zone" id="drop-zone">
+      <div class="uz-icon">📂</div>
+      <h3>Quiz JSON Files Upload Karo</h3>
+      <p>Mock test ka <strong>.json</strong> file yahan drop karo ya click karo<br>
+      Multiple files ek saath select kar sakte ho</p>
+      <input type="file" id="file-input" accept=".json" multiple onchange="handleFiles(this.files)"/>
+    </div>
+
+    <div class="uploaded-list">
+      <h3>📋 Uploaded Tests (<span id="item-count">0</span>)</h3>
+      <div id="items-list"></div>
+    </div>
+  </div>
 </div>
 
-<!-- Quiz Modal -->
-
-<div
-class="overlay"
-id="quizModal">
-
-<div class="modal">
-
-<div class="questionNo">
-
-Question
-
-<span id="currentQuestion">
-
-1
-
-</span>
-
-/
-
-<span id="totalQuestion">
-
-100
-
-</span>
-
-<span
-class="timer"
-id="timer">
-
-60:00
-
-</span>
-
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">—</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
 </div>
 
-<div
-class="question"
-id="question">
+<div class="toast" id="toast"></div>
 
-Question
-
-</div>
-
-<div id="options">
-
-</div>
-
-<div class="nav">
-
-<button
-class="prev">
-
-Previous
-
-</button>
-
-<div>
-
-<button
-class="submit">
-
-Submit
-
-</button>
-
-<button
-class="next">
-
-Next
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- Result -->
-
-<div
-class="overlay"
-id="resultModal">
-
-<div class="modal result">
-
-<h2>
-
-Quiz Result
-
-</h2>
-
-<div
-class="score"
-id="score">
-
-0
-
-</div>
-
-<p
-id="resultText">
-
-</p>
-
-<br>
-
-<button
-class="close">
-
-Close
-
-</button>
-
-</div>
-
-</div>
-<!-- ===========================
-     ADMIN PANEL
-=========================== -->
-
-<div class="overlay" id="adminModal">
-
-<div class="modal">
-
-<h2 style="margin-bottom:20px;">
-⚙️ Admin Panel
-</h2>
-
-<div style="display:grid;gap:15px;">
-
-<input
-id="quizTitle"
-placeholder="Quiz Title"
-style="padding:12px;background:#21262d;border:none;border-radius:8px;color:white;">
-
-<input
-id="quizCategory"
-placeholder="Category (Reasoning / Math)"
-style="padding:12px;background:#21262d;border:none;border-radius:8px;color:white;">
-
-<input
-id="quizDuration"
-type="number"
-placeholder="Duration (Minutes)"
-style="padding:12px;background:#21262d;border:none;border-radius:8px;color:white;">
-
-<input
-id="quizNegative"
-type="number"
-step="0.25"
-placeholder="Negative Marking"
-style="padding:12px;background:#21262d;border:none;border-radius:8px;color:white;">
-
-<div
-style="
-border:2px dashed #444;
-padding:40px;
-text-align:center;
-border-radius:10px;
-cursor:pointer;
-">
-
-<h3>Upload Quiz JSON</h3>
-
-<p>Select or Drag & Drop JSON</p>
-
-<input
-type="file"
-id="jsonFile"
-accept=".json"
-style="margin-top:20px;">
-
-</div>
-
-<button
-id="saveQuiz"
-style="
-padding:15px;
-background:#238636;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
-font-size:18px;
-">
-
-Import Quiz
-
-</button>
-
-<button
-id="closeAdmin"
-style="
-padding:15px;
-background:#30363d;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
-">
-
-Close
-
-</button>
-
-</div>
-
-</div>
-
+<!-- Save bar (only in admin) -->
+<div class="save-bar" id="save-bar" style="display:none;">
+  <button class="btn-export" onclick="exportJSON()">⬇️ Export JSON</button>
+  <button class="btn-save" onclick="saveData()">💾 Save & Publish</button>
 </div>
 
 <script>
+// ──────────────────────────────
+// STATE
+// ──────────────────────────────
+const STORAGE_KEY = 'ranaji_quizzes_v1';
+const SCORES_KEY  = 'ranaji_quiz_scores_v1';
+let quizzes = [];
+let scores  = {}; // quiz_id -> { best: %, attempts: n }
 
-const STORAGE_KEY="ranaji_quiz_storage";
+// Active attempt state
+let attempt = null; // { quiz, answers:[], idx, secondsLeft, timerId, submitted }
 
-let quizzes=[];
+function loadQuizzes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    quizzes = raw ? JSON.parse(raw) : [];
+  } catch { quizzes = []; }
+  try {
+    const raw2 = localStorage.getItem(SCORES_KEY);
+    scores = raw2 ? JSON.parse(raw2) : {};
+  } catch { scores = {}; }
+}
+function saveQuizzes() { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizzes)); }
+function saveScores()  { localStorage.setItem(SCORES_KEY, JSON.stringify(scores)); }
 
-let currentQuiz=null;
+// ──────────────────────────────
+// ROUTING
+// ──────────────────────────────
+function getRoute() { return window.location.hash || '#home'; }
+function goHome() { window.location.hash = '#home'; }
+function goAdmin() { window.location.hash = '#ranaji'; }
+window.addEventListener('hashchange', renderRoute);
 
-let currentQuestion=0;
-
-let answers=[];
-
-let timerInterval=null;
-
-function loadStorage(){
-
-const raw=localStorage.getItem(STORAGE_KEY);
-
-if(raw){
-
-quizzes=JSON.parse(raw);
-
-}else{
-
-quizzes=[];
-
+function renderRoute() {
+  const hash = getRoute();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('save-bar').style.display = 'none';
+  if (hash === '#ranaji') {
+    document.getElementById('page-admin').classList.add('active');
+    document.getElementById('save-bar').style.display = 'flex';
+    renderAdminList();
+  } else {
+    document.getElementById('page-home').classList.add('active');
+    renderGrid();
+  }
 }
 
+// ──────────────────────────────
+// HOME GRID
+// ──────────────────────────────
+function renderGrid() {
+  const container = document.getElementById('grid-container');
+  const badge = document.getElementById('count-badge');
+  badge.textContent = `${quizzes.length} test${quizzes.length !== 1 ? 's' : ''}`;
+
+  if (quizzes.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <h3>Koi mock test nahi mila</h3>
+        <p>Admin panel mein JSON files upload karo<br>
+        <strong>URL:</strong> <code>#ranaji</code> → ⚙️ Admin button</p>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...quizzes].sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
+  container.innerHTML = `<div class="grid">${sorted.map((q,i) => cardHTML(q,i)).join('')}</div>`;
 }
 
-function saveStorage(){
-
-localStorage.setItem(
-
-STORAGE_KEY,
-
-JSON.stringify(quizzes)
-
-);
-
+function difficultyBadge(d) {
+  if (d === 'easy') return 'badge-easy';
+  if (d === 'hard') return 'badge-hard';
+  return 'badge-medium';
 }
 
-function renderCards(){
-
-const grid=document.getElementById("quizGrid");
-
-grid.innerHTML="";
-
-if(quizzes.length===0){
-
-grid.innerHTML=`
-
-<div style="
-
-grid-column:1/-1;
-
-text-align:center;
-
-padding:100px;
-
-opacity:.7;
-
-">
-
-<h2>
-
-No Quiz Available
-
-</h2>
-
-<p>
-
-Open Admin Panel and upload JSON.
-
-</p>
-
-</div>
-
-`;
-
-return;
-
+function cardHTML(q, idx) {
+  const title = q.title || `Mock Test #${q.quiz_id}`;
+  const s = scores[q.quiz_id];
+  return `
+    <div class="card" onclick="openModal(${idx})">
+      <div class="card-thumb">
+        <div class="type-icon">📝</div>
+        <span class="card-type-badge ${difficultyBadge(q.difficulty)}">${q.difficulty || 'medium'}</span>
+        ${s ? `<span class="badge-score">Best ${s.best}%</span>` : ''}
+        <div class="play-btn">START TEST</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${escHtml(title)}</div>
+        <div class="card-meta">
+          <span>❓ ${q.questions ? q.questions.length : 0} Qs</span>
+          ${q.duration_minutes ? `<span>⏱ ${q.duration_minutes} min</span>` : ''}
+          <span>${q.subject || 'General'}</span>
+        </div>
+      </div>
+    </div>`;
 }
 
-quizzes.forEach((quiz,index)=>{
+// ──────────────────────────────
+// MODAL — INTRO / RESULT (video/pdf equivalent)
+// ──────────────────────────────
+function openModal(idx) {
+  const sorted = [...quizzes].sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
+  const q = sorted[idx];
+  if (!q) return;
+  showIntro(q);
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
-const card=document.createElement("div");
+function showIntro(q) {
+  document.getElementById('modal-title').textContent = q.title || `Mock Test #${q.quiz_id}`;
+  const s = scores[q.quiz_id];
+  const totalMarks = (q.questions || []).reduce((sum,x) => sum + (x.marks || 1), 0);
 
-card.className="card";
+  if (!q.questions || q.questions.length === 0) {
+    document.getElementById('modal-body').innerHTML = `<div class="media-error"><p>❌ Is test mein koi question nahi mila. Admin panel se dobara JSON check karo.</p></div>`;
+    return;
+  }
 
-card.innerHTML=`
+  document.getElementById('modal-body').innerHTML = `
+    <div class="q-card" style="text-align:center;">
+      <div class="q-progress">${q.subject || 'General'} • ${q.difficulty || 'medium'}</div>
+      <div class="q-text" style="text-align:center;">${escHtml(q.title || 'Mock Test')}</div>
+      <div class="result-stats" style="margin-bottom:1.4rem;">
+        <div class="rstat"><b>${q.questions.length}</b>Questions</div>
+        <div class="rstat"><b>${q.duration_minutes || '—'}</b>Minutes</div>
+        <div class="rstat"><b>${totalMarks}</b>Marks</div>
+      </div>
+      ${s ? `<p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem;">Best score so far: <strong style="color:var(--gold);">${s.best}%</strong> (${s.attempts} attempt${s.attempts>1?'s':''})</p>` : ''}
+      <button class="btn-tg" style="background:var(--accent);" onclick="startTest(${q.quiz_id})">▶️ Start Test</button>
+    </div>`;
+}
 
-<div class="thumb">
+function closeModal(e) { if (e.target === document.getElementById('modal')) closeModalDirect(); }
+function closeModalDirect() {
+  if (attempt && !attempt.submitted) {
+    if (!confirm('Test abhi submit nahi hua hai. Band karoge toh progress save nahi hogi. Pakka?')) return;
+  }
+  stopTimer();
+  attempt = null;
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
-📝
+// ──────────────────────────────
+// TEST TAKING
+// ──────────────────────────────
+function startTest(quizId) {
+  const q = quizzes.find(x => x.quiz_id === quizId);
+  if (!q) return;
+  attempt = {
+    quiz: q,
+    answers: new Array(q.questions.length).fill(null),
+    idx: 0,
+    secondsLeft: (q.duration_minutes || 30) * 60,
+    timerId: null,
+    submitted: false
+  };
+  document.getElementById('modal-title').textContent = q.title || `Mock Test #${q.quiz_id}`;
+  renderQuestion();
+  startTimer();
+}
 
-</div>
+function startTimer() {
+  stopTimer();
+  attempt.timerId = setInterval(() => {
+    attempt.secondsLeft--;
+    updateTimerDisplay();
+    if (attempt.secondsLeft <= 0) {
+      stopTimer();
+      submitTest(true);
+    }
+  }, 1000);
+}
+function stopTimer() { if (attempt && attempt.timerId) { clearInterval(attempt.timerId); attempt.timerId = null; } }
 
-<div class="content">
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-display');
+  if (!el || !attempt) return;
+  const m = Math.floor(attempt.secondsLeft / 60), s = attempt.secondsLeft % 60;
+  el.textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.classList.toggle('low', attempt.secondsLeft <= 60);
+}
 
-<div class="title">
+function renderQuestion() {
+  const q = attempt.quiz;
+  const i = attempt.idx;
+  const question = q.questions[i];
+  const total = q.questions.length;
 
-${quiz.title}
+  const navDots = q.questions.map((_, idx) => {
+    const cls = ['q-dot'];
+    if (idx === i) cls.push('current');
+    else if (attempt.answers[idx] !== null) cls.push('answered');
+    return `<div class="${cls.join(' ')}" onclick="jumpTo(${idx})">${idx+1}</div>`;
+  }).join('');
 
-</div>
+  const options = question.options.map((opt, oIdx) => {
+    const selected = attempt.answers[i] === oIdx;
+    return `
+      <div class="option ${selected ? 'selected' : ''}" onclick="selectOption(${oIdx})">
+        <div class="opt-letter">${String.fromCharCode(65+oIdx)}</div>
+        <div>${escHtml(opt)}</div>
+      </div>`;
+  }).join('');
 
-<div class="meta">
+  document.getElementById('modal-body').innerHTML = `
+    <div class="test-topbar">
+      <div class="q-progress" style="margin:0;">Question ${i+1} / ${total}</div>
+      <div class="timer" id="timer-display">⏱ --:--</div>
+    </div>
+    <div class="q-nav">${navDots}</div>
+    <div class="q-card">
+      <div class="q-text">${escHtml(question.q)}</div>
+      ${options}
+      <div class="q-actions">
+        <button class="btn-nav" onclick="prevQuestion()" ${i===0?'disabled':''}>← Prev</button>
+        ${i === total-1
+          ? `<button class="btn-submit-test" onclick="confirmSubmit()">✅ Submit Test</button>`
+          : `<button class="btn-nav" onclick="nextQuestion()">Next →</button>`}
+      </div>
+    </div>`;
+  updateTimerDisplay();
+}
 
-<span>
+function selectOption(oIdx) {
+  attempt.answers[attempt.idx] = oIdx;
+  renderQuestion();
+}
+function jumpTo(idx) { attempt.idx = idx; renderQuestion(); }
+function nextQuestion() { if (attempt.idx < attempt.quiz.questions.length-1) { attempt.idx++; renderQuestion(); } }
+function prevQuestion() { if (attempt.idx > 0) { attempt.idx--; renderQuestion(); } }
 
-${quiz.category}
+function confirmSubmit() {
+  const unanswered = attempt.answers.filter(a => a === null).length;
+  if (unanswered > 0) {
+    if (!confirm(`${unanswered} question(s) abhi unanswered hain. Submit karna hai?`)) return;
+  }
+  submitTest(false);
+}
 
-</span>
+function submitTest(autoSubmit) {
+  stopTimer();
+  attempt.submitted = true;
+  const q = attempt.quiz;
+  const negMark = q.negative_marking || 0;
+  let correct = 0, wrong = 0, skipped = 0, marksScored = 0, marksTotal = 0;
 
-<span>
+  q.questions.forEach((question, i) => {
+    const m = question.marks || 1;
+    marksTotal += m;
+    const given = attempt.answers[i];
+    if (given === null) { skipped++; return; }
+    if (given === question.answer) { correct++; marksScored += m; }
+    else { wrong++; marksScored -= negMark * m; }
+  });
 
-${quiz.questions.length} Questions
+  marksScored = Math.max(0, marksScored);
+  const pct = marksTotal > 0 ? Math.round((marksScored / marksTotal) * 100) : 0;
 
-</span>
+  const prev = scores[q.quiz_id] || { best: 0, attempts: 0 };
+  scores[q.quiz_id] = { best: Math.max(prev.best, pct), attempts: prev.attempts + 1 };
+  saveScores();
 
-</div>
+  renderResult({ correct, wrong, skipped, marksScored, marksTotal, pct, autoSubmit });
+}
 
-<div class="meta">
+function renderResult(r) {
+  const q = attempt.quiz;
+  const reviewHTML = q.questions.map((question, i) => {
+    const given = attempt.answers[i];
+    const optsHTML = question.options.map((opt, oIdx) => {
+      let cls = '';
+      if (oIdx === question.answer) cls = 'correct';
+      else if (oIdx === given) cls = 'wrong';
+      return `<div class="review-opt ${cls}">${escHtml(String.fromCharCode(65+oIdx) + '. ' + opt)}${oIdx===question.answer?' ✓':''}${oIdx===given && given!==question.answer?' ✗ (tumhara jawab)':''}</div>`;
+    }).join('');
+    return `
+      <div class="review-item">
+        <div class="q-text">${i+1}. ${escHtml(question.q)}</div>
+        ${optsHTML}
+      </div>`;
+  }).join('');
 
-<span>
+  document.getElementById('modal-body').innerHTML = `
+    <div class="result-hero">
+      ${r.autoSubmit ? `<p style="color:var(--accent);font-size:.85rem;margin-bottom:.5rem;">⏱ Time up — test auto-submit ho gaya</p>` : ''}
+      <div class="result-score">${r.pct}<span>%</span></div>
+      <p style="color:var(--muted);font-size:.85rem;">${r.marksScored} / ${r.marksTotal} marks</p>
+      <div class="result-stats">
+        <div class="rstat correct"><b>${r.correct}</b>Correct</div>
+        <div class="rstat wrong"><b>${r.wrong}</b>Wrong</div>
+        <div class="rstat skip"><b>${r.skipped}</b>Skipped</div>
+      </div>
+    </div>
+    <div class="modal-meta" style="justify-content:center;">
+      <button class="btn-tg" style="background:var(--surface);border:1px solid var(--border);" onclick="startTest(${q.quiz_id})">🔁 Retake Test</button>
+      <button class="btn-tg" onclick="goHome();closeModalDirect();" style="background:var(--blue);">🏠 Back to Tests</button>
+    </div>
+    <h3 style="font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:1.5rem 0 .8rem;">📖 Answer Review</h3>
+    ${reviewHTML}`;
+}
 
-${quiz.duration} Min
+// ──────────────────────────────
+// ADMIN
+// ──────────────────────────────
+function renderAdminList() {
+  document.getElementById('item-count').textContent = quizzes.length;
+  const list = document.getElementById('items-list');
+  if (quizzes.length === 0) {
+    list.innerHTML = `<div style="color:var(--muted);font-size:.85rem;padding:1rem 0;">
+      Koi tests nahi hain. JSON files upload karo upar se.</div>`;
+    return;
+  }
+  const sorted = [...quizzes].sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
+  list.innerHTML = sorted.map(q => {
+    const title = q.title || `Mock Test #${q.quiz_id}`;
+    const iconClass = q.difficulty === 'easy' ? 'ji-easy' : q.difficulty === 'hard' ? 'ji-hard' : 'ji-medium';
+    return `
+      <div class="json-item" id="item-${q.quiz_id}">
+        <div class="ji-icon ${iconClass}">📝</div>
+        <div class="ji-info">
+          <div class="ji-title" title="${escHtml(title)}">${escHtml(title.substring(0,80))}</div>
+          <div class="ji-sub">#${q.quiz_id} • ${(q.questions||[]).length} Qs • ${q.subject||'?'} • ${q.duration_minutes||'—'} min</div>
+        </div>
+        <div class="ji-actions">
+          <button class="ji-del" onclick="deleteQuiz(${q.quiz_id})">🗑️</button>
+        </div>
+      </div>`;
+  }).join('');
+}
 
-</span>
+function deleteQuiz(quizId) {
+  quizzes = quizzes.filter(q => q.quiz_id !== quizId);
+  renderAdminList();
+  document.getElementById('item-count').textContent = quizzes.length;
+  showToast('Test remove hua!');
+}
 
-<span>
-
--${quiz.negative_marking}
-
-</span>
-
-</div>
-
-<button
-
-class="start"
-
-onclick="startQuiz(${index})"
-
->
-
-Start Quiz
-
-</button>
-
-</div>
-
-`;
-
-grid.appendChild(card);
-
+// ──────────────────────────────
+// FILE HANDLING
+// ──────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
 });
 
+function handleFiles(files) {
+  let count = 0;
+  const fileArr = Array.from(files);
+  fileArr.forEach(file => {
+    if (!file.name.endsWith('.json')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        const items = Array.isArray(data) ? data : [data];
+        items.forEach(item => {
+          if (!item.quiz_id || !Array.isArray(item.questions)) return;
+          quizzes = quizzes.filter(q => q.quiz_id !== item.quiz_id);
+          quizzes.push(item);
+          count++;
+        });
+        renderAdminList();
+        showToast(`✅ ${count} test(s) load hua!`);
+      } catch {
+        showToast('❌ Invalid JSON file');
+      }
+    };
+    reader.readAsText(file);
+  });
 }
 
-loadStorage();
-
-renderCards();
-  // ===========================
-// ADMIN EVENTS
-// ===========================
-
-document.querySelector(".adminBtn").onclick=function(){
-
-document.getElementById("adminModal").style.display="flex";
-
+// ──────────────────────────────
+// SAVE / EXPORT
+// ──────────────────────────────
+function saveData() {
+  saveQuizzes();
+  renderGrid();
+  showToast('✅ Saved & Published!');
+}
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(quizzes, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ranaji_quizzes.json';
+  a.click();
 }
 
-document.getElementById("closeAdmin").onclick=function(){
-
-document.getElementById("adminModal").style.display="none";
-
+// ──────────────────────────────
+// UTILS
+// ──────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-
-// ===========================
-// IMPORT JSON
-// ===========================
-
-document.getElementById("saveQuiz").onclick=function(){
-
-const file=document.getElementById("jsonFile").files[0];
-
-if(!file){
-
-alert("Select JSON File");
-
-return;
-
-}
-
-const reader=new FileReader();
-
-reader.onload=function(e){
-
-try{
-
-const quiz=JSON.parse(e.target.result);
-
-if(!quiz.questions){
-
-alert("Invalid Quiz");
-
-return;
-
-}
-
-// prevent duplicate title
-
-quizzes=quizzes.filter(
-
-q=>q.title!==quiz.title
-
-);
-
-quizzes.push(quiz);
-
-saveStorage();
-
-renderCards();
-
-alert("Quiz Imported Successfully");
-
-document.getElementById("adminModal").style.display="none";
-
-}catch(err){
-
-alert("Invalid JSON");
-
-}
-
-}
-
-reader.readAsText(file);
-
-}
-
-
-
-// ===========================
-// START QUIZ
-// ===========================
-
-function startQuiz(index){
-
-currentQuiz=quizzes[index];
-
-currentQuestion=0;
-
-answers=new Array(
-
-currentQuiz.questions.length
-
-).fill(null);
-
-document.getElementById("quizModal").style.display="flex";
-
-startTimer();
-
-loadQuestion();
-
-}
-
-
-
-// ===========================
-// LOAD QUESTION
-// ===========================
-
-function loadQuestion(){
-
-const q=currentQuiz.questions[currentQuestion];
-
-document.getElementById("currentQuestion").innerText=currentQuestion+1;
-
-document.getElementById("totalQuestion").innerText=currentQuiz.questions.length;
-
-document.getElementById("question").innerHTML=q.question;
-
-const optionBox=document.getElementById("options");
-
-optionBox.innerHTML="";
-
-q.options.forEach((option,index)=>{
-
-const div=document.createElement("div");
-
-div.className="option";
-
-if(answers[currentQuestion]===index){
-
-div.style.border="2px solid #58a6ff";
-
-}
-
-div.innerHTML=option;
-
-div.onclick=function(){
-
-answers[currentQuestion]=index;
-
-loadQuestion();
-
-}
-
-optionBox.appendChild(div);
-
-});
-
-}
-
-
-
-// ===========================
-// NEXT
-// ===========================
-
-document.querySelector(".next").onclick=function(){
-
-if(currentQuestion<currentQuiz.questions.length-1){
-
-currentQuestion++;
-
-loadQuestion();
-
-}
-
-}
-
-
-
-// ===========================
-// PREVIOUS
-// ===========================
-
-document.querySelector(".prev").onclick=function(){
-
-if(currentQuestion>0){
-
-currentQuestion--;
-
-loadQuestion();
-
-}
-
-}
-
-
-
-// ===========================
-// SEARCH
-// ===========================
-
-document.getElementById("search").onkeyup=function(){
-
-const value=this.value.toLowerCase();
-
-const cards=document.querySelectorAll(".card");
-
-cards.forEach(card=>{
-
-const title=card.querySelector(".title").innerText.toLowerCase();
-
-if(title.includes(value)){
-
-card.style.display="block";
-
-}else{
-
-card.style.display="none";
-
-}
-
-});
-
-}
-
-
-
-// ===========================
-// CATEGORY FILTER
-// ===========================
-
-document.querySelectorAll(".filter").forEach(btn=>{
-
-btn.onclick=function(){
-
-const category=this.innerText;
-
-const cards=document.querySelectorAll(".card");
-
-cards.forEach((card,index)=>{
-
-if(category==="All"){
-
-card.style.display="block";
-
-return;
-
-}
-
-if(
-
-quizzes[index].category===category
-
-){
-
-card.style.display="block";
-
-}else{
-
-card.style.display="none";
-
-}
-
-});
-
-}
-
-});
-  // ===========================
-// TIMER
-// ===========================
-
-let timeLeft = 0;
-
-function startTimer(){
-
-clearInterval(timerInterval);
-
-timeLeft = currentQuiz.duration * 60;
-
-updateTimer();
-
-timerInterval = setInterval(()=>{
-
-timeLeft--;
-
-updateTimer();
-
-if(timeLeft<=0){
-
-clearInterval(timerInterval);
-
-submitQuiz();
-
-}
-
-},1000);
-
-}
-
-function updateTimer(){
-
-let m=Math.floor(timeLeft/60);
-
-let s=timeLeft%60;
-
-document.getElementById("timer").innerHTML=
-
-String(m).padStart(2,"0")+":"+
-
-String(s).padStart(2,"0");
-
-}
-
-
-
-// ===========================
-// SUBMIT
-// ===========================
-
-document.querySelector(".submit").onclick=function(){
-
-submitQuiz();
-
-};
-
-function submitQuiz(){
-
-clearInterval(timerInterval);
-
-let correct=0;
-
-let wrong=0;
-
-let skipped=0;
-
-let score=0;
-
-currentQuiz.questions.forEach((q,index)=>{
-
-if(answers[index]===null){
-
-skipped++;
-
-return;
-
-}
-
-if(answers[index]===q.answer){
-
-correct++;
-
-score++;
-
-}else{
-
-wrong++;
-
-score-=currentQuiz.negative_marking;
-
-}
-
-});
-
-document.getElementById("quizModal").style.display="none";
-
-document.getElementById("resultModal").style.display="flex";
-
-document.getElementById("score").innerHTML=score;
-
-let accuracy=0;
-
-if(currentQuiz.questions.length>0){
-
-accuracy=((correct/currentQuiz.questions.length)*100).toFixed(1);
-
-}
-
-document.getElementById("resultText").innerHTML=`
-
-Correct : <b>${correct}</b><br><br>
-
-Wrong : <b>${wrong}</b><br><br>
-
-Skipped : <b>${skipped}</b><br><br>
-
-Accuracy : <b>${accuracy}%</b>
-
-`;
-
-}
-
-
-
-// ===========================
-// CLOSE RESULT
-// ===========================
-
-document.querySelector(".close").onclick=function(){
-
-document.getElementById("resultModal").style.display="none";
-
-};
-
-
-
-// ===========================
-// CLOSE MODAL ON BACKGROUND
-// ===========================
-
-document.querySelectorAll(".overlay").forEach(o=>{
-
-o.onclick=function(e){
-
-if(e.target===o){
-
-o.style.display="none";
-
-clearInterval(timerInterval);
-
-}
-
-};
-
-});
-
-
-
-// ===========================
-// ESC KEY
-// ===========================
-
-document.addEventListener("keydown",function(e){
-
-if(e.key==="Escape"){
-
-document.getElementById("quizModal").style.display="none";
-
-document.getElementById("resultModal").style.display="none";
-
-document.getElementById("adminModal").style.display="none";
-
-clearInterval(timerInterval);
-
-}
-
-});
-
-
-
-// ===========================
-// SAMPLE QUIZ (ONLY FIRST RUN)
-// ===========================
-
-if(quizzes.length===0){
-
-quizzes.push({
-
-title:"Demo Quiz",
-
-category:"Reasoning",
-
-duration:5,
-
-negative_marking:0.5,
-
-questions:[
-
-{
-
-question:"2 + 2 = ?",
-
-options:["2","3","4","5"],
-
-answer:2
-
-},
-
-{
-
-question:"Capital of India?",
-
-options:["Mumbai","Delhi","Kolkata","Chennai"],
-
-answer:1
-
-},
-
-{
-
-question:"5 × 6 = ?",
-
-options:["20","25","30","35"],
-
-answer:2
-
-}
-
-]
-
-});
-
-saveStorage();
-
-renderCards();
-
-}
-
+// ──────────────────────────────
+// INIT
+// ──────────────────────────────
+loadQuizzes();
+renderRoute();
 </script>
-
 </body>
-
 </html>
