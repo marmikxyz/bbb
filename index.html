@@ -67,6 +67,18 @@ header {
 .hero { text-align:center; padding:3rem 1rem 2.5rem; }
 .hero h1 { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:4px; margin-bottom:.5rem; }
 .hero p { color:var(--muted); font-size:1rem; }
+.search-bar { max-width:480px; margin:0 auto 1rem; position:relative; }
+.search-bar input {
+  width:100%; background:var(--card); border:1px solid var(--border);
+  color:var(--text); padding:.75rem 1.2rem .75rem 2.6rem; border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-size:.9rem; transition:.2s;
+}
+.search-bar input:focus { outline:none; border-color:var(--blue); }
+.search-bar::before {
+  content:'🔍'; position:absolute; left:.9rem; top:50%; transform:translateY(-50%);
+  font-size:.9rem; opacity:.6; pointer-events:none;
+}
+.search-bar input::placeholder { color:var(--muted); }
 .empty-state {
   text-align:center; padding:5rem 2rem;
   border: 1px dashed var(--border); border-radius:16px;
@@ -98,6 +110,7 @@ header {
   display:flex; align-items:center; justify-content:center;
 }
 .card-thumb .type-icon { font-size:2.5rem; opacity:.4; }
+.card-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 .card-thumb .play-btn {
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
@@ -303,6 +316,53 @@ header {
 }
 @keyframes toastAnim { from { opacity:0; transform:translate(-50%,10px); } to { opacity:1; transform:translate(-50%,0); } }
 footer { position:relative; z-index:1; text-align:center; padding:2rem; color:var(--muted); font-size:.78rem; border-top:1px solid var(--border); margin-top:3rem; }
+/* ══ FULLSCREEN TEST MODE ══ */
+.modal:fullscreen, .modal:-webkit-full-screen {
+  max-width:100%; max-height:100%; width:100%; height:100%;
+  border-radius:0; background:var(--surface);
+}
+.modal:fullscreen .modal-body, .modal:-webkit-full-screen .modal-body { max-width:900px; margin:0 auto; }
+.fs-toggle {
+  background:var(--surface); border:1px solid var(--border); color:var(--muted);
+  padding:.4rem .7rem; border-radius:7px; cursor:pointer; font-size:.8rem;
+  font-family:'DM Sans',sans-serif; transition:.2s;
+}
+.fs-toggle:hover { color:var(--text); border-color:var(--muted); }
+/* ══ ADMIN LOCK ══ */
+.admin-lock {
+  min-height:70vh; display:flex; align-items:center; justify-content:center; padding:2rem;
+}
+.lock-box {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:2.5rem 2rem; text-align:center; max-width:340px; width:100%;
+}
+.lock-icon { font-size:2.8rem; margin-bottom:.8rem; }
+.lock-box h3 { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px; margin-bottom:.4rem; }
+.lock-box p { color:var(--muted); font-size:.82rem; margin-bottom:1.2rem; }
+.lock-box input {
+  width:100%; background:var(--surface); border:1px solid var(--border);
+  color:var(--text); padding:.7rem 1rem; border-radius:9px; margin-bottom:1rem;
+  font-family:'DM Sans',sans-serif; font-size:.9rem; text-align:center;
+}
+.lock-box input:focus { outline:none; border-color:var(--accent); }
+.lock-error { color:var(--accent); font-size:.8rem; margin-top:.8rem; min-height:1em; }
+.admin-logout {
+  margin-left:auto; background:var(--surface); border:1px solid var(--border);
+  color:var(--muted); padding:.4rem .9rem; border-radius:7px; cursor:pointer;
+  font-size:.8rem; font-family:'DM Sans',sans-serif; transition:.2s;
+}
+.admin-logout:hover { color:var(--accent); border-color:var(--accent); }
+/* ══ ADMIN PHOTO UPLOAD ══ */
+.ji-thumb {
+  width:36px; height:36px; border-radius:8px; object-fit:cover; flex-shrink:0;
+}
+.ji-photo-btn {
+  background:var(--surface); border:1px solid var(--border); color:var(--muted);
+  padding:.3rem .6rem; border-radius:6px; font-size:.75rem; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:.2s; position:relative; overflow:hidden;
+}
+.ji-photo-btn:hover { color:var(--text); border-color:var(--muted); }
+.ji-photo-btn input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
 @media(max-width:600px) {
   header { padding:.8rem 1rem; }
   .hero h1 { font-size:2.2rem; }
@@ -330,6 +390,9 @@ footer { position:relative; z-index:1; text-align:center; padding:2rem; color:va
       <h1>📝 Ranaji Quiz</h1>
       <p>Mock tests • Practice papers • Instant results</p>
     </div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by title, subject or difficulty..." oninput="renderGrid()"/>
+    </div>
     <div id="grid-container"></div>
   </div>
   <footer>Ranaji Quiz • Practice Karo, Pass Karo • @ranajoji</footer>
@@ -337,10 +400,22 @@ footer { position:relative; z-index:1; text-align:center; padding:2rem; color:va
 
 <!-- ══ ADMIN PAGE ══ -->
 <div id="page-admin" class="page">
-  <div id="admin">
+  <div id="admin-lock" class="admin-lock">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <h3>Admin Access</h3>
+      <p>Password daalo panel kholne ke liye</p>
+      <input type="password" id="admin-pass-input" placeholder="Password" onkeydown="if(event.key==='Enter') tryAdminLogin()"/>
+      <button class="btn-tg" style="background:var(--accent);width:100%;justify-content:center;" onclick="tryAdminLogin()">Unlock</button>
+      <div class="lock-error" id="lock-error"></div>
+    </div>
+  </div>
+
+  <div id="admin" style="display:none;">
     <div class="admin-header">
       <button class="back-btn" onclick="goHome()">← Back</button>
       <h2>⚙️ Admin Panel</h2>
+      <button class="admin-logout" onclick="lockAdmin()">🔒 Lock</button>
     </div>
 
     <div class="upload-zone" id="drop-zone">
@@ -383,6 +458,7 @@ footer { position:relative; z-index:1; text-align:center; padding:2rem; color:va
 // ──────────────────────────────
 const STORAGE_KEY = 'ranaji_quizzes_v1';
 const SCORES_KEY  = 'ranaji_quiz_scores_v1';
+const ADMIN_PASSWORD = 'ranaji123'; // 👈 change this to your own admin password
 let quizzes = [];
 let scores  = {}; // quiz_id -> { best: %, attempts: n }
 
@@ -416,12 +492,46 @@ function renderRoute() {
   document.getElementById('save-bar').style.display = 'none';
   if (hash === '#ranaji') {
     document.getElementById('page-admin').classList.add('active');
-    document.getElementById('save-bar').style.display = 'flex';
-    renderAdminList();
+    if (isAdminUnlocked()) {
+      showAdminPanel();
+    } else {
+      document.getElementById('admin-lock').style.display = 'flex';
+      document.getElementById('admin').style.display = 'none';
+      const input = document.getElementById('admin-pass-input');
+      input.value = '';
+      document.getElementById('lock-error').textContent = '';
+      setTimeout(() => input.focus(), 50);
+    }
   } else {
     document.getElementById('page-home').classList.add('active');
     renderGrid();
   }
+}
+
+// ──────────────────────────────
+// ADMIN PASSWORD GATE
+// ──────────────────────────────
+function isAdminUnlocked() { return sessionStorage.getItem('ranaji_admin_unlocked') === '1'; }
+function tryAdminLogin() {
+  const val = document.getElementById('admin-pass-input').value;
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem('ranaji_admin_unlocked', '1');
+    showAdminPanel();
+  } else {
+    document.getElementById('lock-error').textContent = '❌ Galat password, dobara try karo';
+    document.getElementById('admin-pass-input').value = '';
+    document.getElementById('admin-pass-input').focus();
+  }
+}
+function showAdminPanel() {
+  document.getElementById('admin-lock').style.display = 'none';
+  document.getElementById('admin').style.display = 'block';
+  document.getElementById('save-bar').style.display = 'flex';
+  renderAdminList();
+}
+function lockAdmin() {
+  sessionStorage.removeItem('ranaji_admin_unlocked');
+  renderRoute();
 }
 
 // ──────────────────────────────
@@ -443,8 +553,28 @@ function renderGrid() {
     return;
   }
 
-  const sorted = [...quizzes].sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
-  container.innerHTML = `<div class="grid">${sorted.map((q,i) => cardHTML(q,i)).join('')}</div>`;
+  const searchInput = document.getElementById('search-input');
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  let filtered = [...quizzes];
+  if (query) {
+    filtered = filtered.filter(q => {
+      const haystack = `${q.title||''} ${q.subject||''} ${q.difficulty||''}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <h3>Kuch nahi mila "${escHtml(query)}" ke liye</h3>
+        <p>Alag keyword try karo ya search clear karo</p>
+      </div>`;
+    return;
+  }
+
+  const sorted = filtered.sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
+  container.innerHTML = `<div class="grid">${sorted.map(q => cardHTML(q)).join('')}</div>`;
 }
 
 function difficultyBadge(d) {
@@ -453,13 +583,16 @@ function difficultyBadge(d) {
   return 'badge-medium';
 }
 
-function cardHTML(q, idx) {
+function cardHTML(q) {
   const title = q.title || `Mock Test #${q.quiz_id}`;
   const s = scores[q.quiz_id];
+  const thumb = q.thumbnail
+    ? `<img src="${q.thumbnail}" alt="${escHtml(title)}"/>`
+    : `<div class="type-icon">📝</div>`;
   return `
-    <div class="card" onclick="openModal(${idx})">
+    <div class="card" onclick="openModal(${q.quiz_id})">
       <div class="card-thumb">
-        <div class="type-icon">📝</div>
+        ${thumb}
         <span class="card-type-badge ${difficultyBadge(q.difficulty)}">${q.difficulty || 'medium'}</span>
         ${s ? `<span class="badge-score">Best ${s.best}%</span>` : ''}
         <div class="play-btn">START TEST</div>
@@ -478,9 +611,8 @@ function cardHTML(q, idx) {
 // ──────────────────────────────
 // MODAL — INTRO / RESULT (video/pdf equivalent)
 // ──────────────────────────────
-function openModal(idx) {
-  const sorted = [...quizzes].sort((a,b) => (b.quiz_id||0) - (a.quiz_id||0));
-  const q = sorted[idx];
+function openModal(quizId) {
+  const q = quizzes.find(x => x.quiz_id === quizId);
   if (!q) return;
   showIntro(q);
   document.getElementById('modal').classList.add('open');
@@ -497,8 +629,12 @@ function showIntro(q) {
     return;
   }
 
+  const thumbHTML = q.thumbnail
+    ? `<img src="${q.thumbnail}" alt="" style="width:100%;max-width:280px;border-radius:10px;margin:0 auto 1rem;display:block;"/>`
+    : '';
   document.getElementById('modal-body').innerHTML = `
     <div class="q-card" style="text-align:center;">
+      ${thumbHTML}
       <div class="q-progress">${q.subject || 'General'} • ${q.difficulty || 'medium'}</div>
       <div class="q-text" style="text-align:center;">${escHtml(q.title || 'Mock Test')}</div>
       <div class="result-stats" style="margin-bottom:1.4rem;">
@@ -517,9 +653,29 @@ function closeModalDirect() {
     if (!confirm('Test abhi submit nahi hua hai. Band karoge toh progress save nahi hogi. Pakka?')) return;
   }
   stopTimer();
+  exitFullscreen();
   attempt = null;
   document.getElementById('modal').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+// ──────────────────────────────
+// FULLSCREEN
+// ──────────────────────────────
+function enterFullscreen() {
+  const el = document.getElementById('modal-box');
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (req) req.call(el).catch(() => {});
+}
+function exitFullscreen() {
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+  if (!isFs) return;
+  const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+  if (exit) exit.call(document).catch(() => {});
+}
+function toggleFullscreen() {
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if (isFs) exitFullscreen(); else enterFullscreen();
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
@@ -540,6 +696,7 @@ function startTest(quizId) {
   document.getElementById('modal-title').textContent = q.title || `Mock Test #${q.quiz_id}`;
   renderQuestion();
   startTimer();
+  enterFullscreen();
 }
 
 function startTimer() {
@@ -588,7 +745,10 @@ function renderQuestion() {
   document.getElementById('modal-body').innerHTML = `
     <div class="test-topbar">
       <div class="q-progress" style="margin:0;">Question ${i+1} / ${total}</div>
-      <div class="timer" id="timer-display">⏱ --:--</div>
+      <div style="display:flex;gap:.6rem;align-items:center;">
+        <button class="fs-toggle" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <div class="timer" id="timer-display">⏱ --:--</div>
+      </div>
     </div>
     <div class="q-nav">${navDots}</div>
     <div class="q-card">
@@ -622,6 +782,7 @@ function confirmSubmit() {
 
 function submitTest(autoSubmit) {
   stopTimer();
+  exitFullscreen();
   attempt.submitted = true;
   const q = attempt.quiz;
   const negMark = q.negative_marking || 0;
@@ -697,18 +858,38 @@ function renderAdminList() {
   list.innerHTML = sorted.map(q => {
     const title = q.title || `Mock Test #${q.quiz_id}`;
     const iconClass = q.difficulty === 'easy' ? 'ji-easy' : q.difficulty === 'hard' ? 'ji-hard' : 'ji-medium';
+    const iconHTML = q.thumbnail
+      ? `<img src="${q.thumbnail}" class="ji-thumb" alt=""/>`
+      : `<div class="ji-icon ${iconClass}">📝</div>`;
     return `
       <div class="json-item" id="item-${q.quiz_id}">
-        <div class="ji-icon ${iconClass}">📝</div>
+        ${iconHTML}
         <div class="ji-info">
           <div class="ji-title" title="${escHtml(title)}">${escHtml(title.substring(0,80))}</div>
           <div class="ji-sub">#${q.quiz_id} • ${(q.questions||[]).length} Qs • ${q.subject||'?'} • ${q.duration_minutes||'—'} min</div>
         </div>
         <div class="ji-actions">
+          <label class="ji-photo-btn">🖼️ Photo
+            <input type="file" accept="image/*" onchange="handlePhoto(${q.quiz_id}, this.files[0])"/>
+          </label>
           <button class="ji-del" onclick="deleteQuiz(${q.quiz_id})">🗑️</button>
         </div>
       </div>`;
   }).join('');
+}
+
+function handlePhoto(quizId, file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('❌ Sirf image files allowed'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const quiz = quizzes.find(q => q.quiz_id === quizId);
+    if (!quiz) return;
+    quiz.thumbnail = e.target.result; // base64 data URL
+    renderAdminList();
+    showToast('🖼️ Photo add hui — Save & Publish karna na bhoolo!');
+  };
+  reader.readAsDataURL(file);
 }
 
 function deleteQuiz(quizId) {
